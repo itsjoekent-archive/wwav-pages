@@ -2,7 +2,26 @@
 
 Custom voter registration pages for When We All Vote.
 
-## NextJS Docs
+## Setup
+
+Requires NodeJS 12.x or greater.
+
+```sh
+$ npm install
+$ npm run dev
+```
+
+It's also recommend to have the [Vercel CLI](https://vercel.com/download).
+
+```sh
+$ npm i -g vercel
+```
+
+## Deployment
+
+...
+
+## NextJS Generated Docs
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
