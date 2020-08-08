@@ -1,0 +1,30 @@
+version: '3.3'
+
+services:
+  webpack:
+    build: .
+    command: npm run start:webpack
+    volumes:
+      - ./src:/usr/src/app/src:cached
+      - ./public:/usr/src/app/public:cached
+
+  server:
+    build: .
+    command: npm run start:api
+    links:
+      - redis
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./src:/usr/src/app/src:cached
+      - ./public:/usr/src/app/public:cached
+
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+    logging:
+        driver: none
