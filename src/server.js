@@ -14,8 +14,15 @@ if (IS_PROD) {
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 
-// TODO: API endpoints
+app.get('/api/page/:slug', async function (req, res) {
+  try {
+    const { params: { slug } } = req; 
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 app.get('*', async function (req, res) {
   try {
