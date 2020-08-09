@@ -100,6 +100,23 @@ const FormLabel = styled.label`
   `}
 `;
 
+const FormWordCount = styled.span`
+  font-family: ${({ theme }) => theme.fonts.openSans};
+  font-size: 12px;
+  font-weight: 300;
+  color: ${({ theme }) => theme.colors.navy};
+  margin-left: 4px;
+
+  ${({ hasError }) => hasError && css`
+    color: ${({ theme }) => theme.colors.red};
+  `}
+`;
+
+const FormLabelRow = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
 const FormError = styled.p`
   font-family: ${({ theme }) => theme.fonts.openSans};
   font-size: 14px;
@@ -183,6 +200,7 @@ const labelMap = {
   lastName: 'Last name',
   email: 'Email',
   slug: 'Page URL',
+  title: 'Title',
 };
 
 export default function BuildPage() {
@@ -256,6 +274,7 @@ export default function BuildPage() {
       'lastName',
       'email',
       'slug',
+      'title',
     ];
 
     const validation = {};
@@ -272,6 +291,14 @@ export default function BuildPage() {
 
     if (!validation['slug'] && !/^[a-zA-Z0-9-_]+$/.test(state.values['slug'])) {
       validation['slug'] = 'Page URL can only contain letters, numbers, dashes and underscores.';
+    }
+
+    if (!validation['slug'] && (state.values['slug'] || '').length > 30) {
+      validation['slug'] = 'Page path must be 30 characters or less.';
+    }
+
+    if (!validation['title'] && (state.values['title'] || '').length > 140) {
+      validation['title'] = 'Page title must be 140 characters or less.';
     }
 
     if (JSON.stringify(validation) !== JSON.stringify(state.validation)) {
@@ -315,6 +342,60 @@ export default function BuildPage() {
     state.values,
     state.isFocused,
     state.hasPrefilled,
+  ]);
+
+  const lastSlugCheck = React.useRef(null);
+
+  React.useEffect(() => {
+    let cancel = false;
+
+    async function checkSlug() {
+      try {
+        const response = await fetch(`/api/page/${state.values.slug}`);
+        const json = await response.json();
+
+        if (cancel) {
+          return;
+        }
+
+        if (response.status === 200 && !state.validation['slug']) {
+          dispatch((copy) => ({
+            ...copy,
+            validation: {
+              ...copy.validation,
+              slug: 'Sorry, this path is already in use!',
+            },
+          }));
+
+          return;
+        }
+
+        if (response.status === 404 && state.validation.slug) {
+          dispatch((copy) => ({
+            ...copy,
+            validation: {
+              ...copy.validation,
+              slug: null,
+            },
+          }));
+
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (state.values.slug && lastSlugCheck.current !== state.values.slug) {
+      lastSlugCheck.current = state.values.slug;
+      checkSlug();
+    }
+
+    return () => cancel = true;
+  }, [
+    dispatch,
+    state.values.slug,
+    state.validation.slug,
   ]);
 
   return (
@@ -362,7 +443,10 @@ export default function BuildPage() {
             </FormQuestionColumn>
             <FormFieldVerticalLayout>
               <FormInputColumn>
-                <FormLabel hasError={shouldShowError('slug')}>Page URL</FormLabel>
+                <FormLabelRow>
+                  <FormLabel hasError={shouldShowError('slug')}>Page URL</FormLabel>
+                  <FormWordCount hasError={shouldShowError('slug')}>({(state.values['slug'] || '').length}/30)</FormWordCount>
+                </FormLabelRow>
                 <SingleLineTextInput {...textFieldPropsGenerator('slug')} />
                 {shouldShowError('slug') && <FormError>{state.validation['slug']}</FormError>}
                 {!shouldShowError('slug') && state.values['slug'] && (
@@ -378,8 +462,9 @@ export default function BuildPage() {
             </FormQuestionColumn>
             <FormFieldVerticalLayout>
               <FormInputColumn>
-                <FormLabel>Title</FormLabel>
-                <SingleLineTextInput />
+                <FormLabel hasError={shouldShowError('title')}>Title</FormLabel>
+                <SingleLineTextInput {...textFieldPropsGenerator('title')} />
+                {shouldShowError('title') && <FormError>{state.validation['title']}</FormError>}
               </FormInputColumn>
             </FormFieldVerticalLayout>
           </FormFieldContainer>
@@ -388,3 +473,6 @@ export default function BuildPage() {
     </React.Fragment>
   );
 }
+// prompt answer
+// giphy
+// submit
