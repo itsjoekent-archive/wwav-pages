@@ -1,6 +1,10 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { Carousel } from '@giphy/react-components';
+import { GiphyFetch } from '@giphy/js-fetch-api';
 import Banner from './Banner';
+
+const giphyFetch = new GiphyFetch(process.env.GIPHY_SDK_KEY);
 
 const Page = styled.main`
   display: flex;
@@ -153,6 +157,21 @@ const SingleLineTextInput = styled.input`
   `}
 `;
 
+const MultiLineTextInput = styled.textarea`
+  display: block;
+  border: 4px solid ${({ theme }) => theme.colors.navy};
+  font-family: ${({ theme }) => theme.fonts.openSans};
+  font-size: 20px;
+  font-weight: 400;
+  color: ${({ theme }) => theme.colors.navy};
+  background-color: ${({ theme }) => theme.colors.white};
+  padding: 6px 8px;
+
+  ${({ hasError }) => hasError && css`
+    border-color: ${({ theme }) => theme.colors.red};
+  `}
+`;
+
 const FormFieldVerticalLayout = styled.div`
   display: flex;
   flex-direction: column;
@@ -207,13 +226,23 @@ export default function BuildPage() {
   const [state, dispatch] = React.useReducer(
     (state, action) => action(state),
     {
-      values: {},
+      values: { gifQuery: 'voting' },
       isFocused: {},
       hasFocusedOnce: {},
       validation: {},
       hasPrefilled: {},
+      hideGifGallery: false,
     },
   );
+
+  const previousValuesRef = React.useRef({ gifQuery: 'vote' });
+  const previousValues = previousValuesRef.current;
+
+  React.useEffect(() => {
+    previousValuesRef.current = state.values;
+  }, [
+    state.values,
+  ]);
 
   function shouldShowError(fieldId) {
     return state.hasFocusedOnce[fieldId]
@@ -398,6 +427,41 @@ export default function BuildPage() {
     state.validation.slug,
   ]);
 
+  React.useEffect(() => {
+    if (state.values.gifUrl) {
+      return;
+    }
+
+    if (state.values.gifQuery !== previousValues.gifQuery) {
+      if (!state.hideGifGallery) {
+        dispatch((copy) => ({ ...copy, hideGifGallery: true }));
+      }
+    }
+
+    if (state.hideGifGallery) {
+      dispatch((copy) => ({ ...copy, hideGifGallery: false }));
+    }
+  }, [
+    dispatch,
+    state.values.gifUrl,
+    state.values.gifQuery,
+    state.hideGifGallery,
+    previousValues.gifQuery,
+  ]);
+
+  function onGifClick(gif, event) {
+    event.preventDefault();
+    dispatch((copy) => ({
+      ...copy,
+      hideGifGallery: true,
+      values: {
+        ...copy.values,
+        gifUrl: gif.images.downsized_medium.url,
+        gifTitle: gif.title,
+      },
+    }));
+  }
+
   return (
     <React.Fragment>
       <Banner />
@@ -462,10 +526,53 @@ export default function BuildPage() {
             </FormQuestionColumn>
             <FormFieldVerticalLayout>
               <FormInputColumn>
-                <FormLabel hasError={shouldShowError('title')}>Title</FormLabel>
+                <FormLabelRow>
+                  <FormLabel hasError={shouldShowError('title')}>Title</FormLabel>
+                  <FormWordCount hasError={shouldShowError('title')}>({(state.values['title'] || '').length}/140)</FormWordCount>
+                </FormLabelRow>
                 <SingleLineTextInput {...textFieldPropsGenerator('title')} />
                 {shouldShowError('title') && <FormError>{state.validation['title']}</FormError>}
               </FormInputColumn>
+            </FormFieldVerticalLayout>
+          </FormFieldContainer>
+          <FormFieldContainer>
+            <FormQuestionColumn>
+              <FormQuestionStep>step 5.</FormQuestionStep>
+              <FormQuestionText>Share why voting is important to you.</FormQuestionText>
+            </FormQuestionColumn>
+            <FormFieldVerticalLayout>
+              <FormInputColumn>
+                <FormLabelRow>
+                  <FormLabel hasError={shouldShowError('promptAnswer')}>why is voting important to you?</FormLabel>
+                  <FormWordCount hasError={shouldShowError('promptAnswer')}>({(state.values['promptAnswer'] || '').length}/2000)</FormWordCount>
+                </FormLabelRow>
+                <MultiLineTextInput rows="4" {...textFieldPropsGenerator('promptAnswer')} />
+                {shouldShowError('promptAnswer') && <FormError>{state.validation['promptAnswer']}</FormError>}
+              </FormInputColumn>
+            </FormFieldVerticalLayout>
+          </FormFieldContainer>
+          <FormFieldContainer>
+            <FormQuestionColumn>
+              <FormQuestionStep>step 6.</FormQuestionStep>
+              <FormQuestionText>Pick your favorite Gif to grab their attention!</FormQuestionText>
+            </FormQuestionColumn>
+            <FormFieldVerticalLayout>
+              <FormInputColumn>
+                <FormLabel hasError={shouldShowError('gifQuery')}>Search Giphy</FormLabel>
+                <SingleLineTextInput {...textFieldPropsGenerator('gifQuery')} />
+                {shouldShowError('gifQuery') && <FormError>{state.validation['gifQuery']}</FormError>}
+              </FormInputColumn>
+              {!state.hideGifGallery && (
+                <Carousel
+                  gifHeight={200}
+                  fetchGifs={(offset) => giphyFetch.search(state.values.gifQuery, { offset, limit: 10, rating: 'g' })}
+                  hideAttribution={true}
+                  onGifClick={onGifClick}
+                />
+              )}
+              {state.values.gifUrl && (
+                <img src={state.values.gifUrl} alt={state.values.gifTitle} />
+              )}
             </FormFieldVerticalLayout>
           </FormFieldContainer>
         </form>
@@ -473,6 +580,3 @@ export default function BuildPage() {
     </React.Fragment>
   );
 }
-// prompt answer
-// giphy
-// submit

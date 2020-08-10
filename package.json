@@ -9,9 +9,12 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.11.2",
+    "@giphy/js-fetch-api": "^1.6.1",
+    "@giphy/react-components": "^1.6.0",
     "async-redis": "^1.1.7",
     "copy-to-clipboard": "^3.3.1",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-force-https": "^1.0.0",
     "mongodb": "^3.6.0",

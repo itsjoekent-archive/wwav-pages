@@ -1,4 +1,7 @@
+require('dotenv').config();
+
 const path = require('path');
+const webpack = require('webpack');
 
 const sharedConfig = {
   module: {
@@ -12,6 +15,11 @@ const sharedConfig = {
       },
     ],
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.GIPHY_SDK_KEY': JSON.stringify(process.env.GIPHY_SDK_KEY),
+    }),
+  ],
 };
 
 module.exports = [

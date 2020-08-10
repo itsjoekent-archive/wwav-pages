@@ -4,3 +4,5 @@
 /src/ssr-compiled.js
 
 .DS_Store
+
+.env
