@@ -8,7 +8,7 @@ const RateLimitRedisStore = require('rate-limit-redis');
 
 const { default: ssr } = require('./ssr-compiled');
 
-const { IS_PROD, PORT, REDIS_URL } = process.env;
+const { IS_PROD, PORT, REDIS_URL, API_TOKEN } = process.env;
 
 const app = express();
 
@@ -126,6 +126,8 @@ app.post('/api/page', async function (req, res) {
       validation['promptAnswer'] = 'Response must be 2000 characters or less.';
     }
 
+    // TODO: Profanity filter
+
     if (gifUrl && !gifUrl.includes('.giphy.com')) {
       validation['gifUrl'] = 'Must be a Giphy link.';
     }
@@ -153,6 +155,7 @@ app.post('/api/page', async function (req, res) {
       promptAnswer: xss(promptAnswer),
       gifUrl: gifUrl || 'https://media2.giphy.com/media/fq8QIzdyDsjiY46XNJ/giphy.gif',
       gifTitle: 'When We All Vote logo animation',
+      totalSignups: 0,
       createdAt: Date.now(),
     };
 
@@ -162,6 +165,44 @@ app.post('/api/page', async function (req, res) {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Encountered error building page' });
+  }
+});
+
+app.post('/api/page/:slug/count', async function (req, res) {
+  try {
+    const {
+      params: { slug },
+      query: { token },
+      body: { count },
+    } = req;
+
+    if (token !== API_TOKEN) {
+      res.status(401).json({ error: 'Not authorized' });
+      return;
+    }
+
+    const key = `page::${formatSlug(slug.replace('/', ''))}`
+    const page = await client.get(key);
+
+    if (!page) {
+      res.status(404).json({ error: 'Page does not exist for the given slug' });
+      return;
+    }
+
+    if (isNaN(parseInt(count))) {
+      res.status(400).json({ error: 'Count is not a number' });
+      return;
+    }
+
+    await client.set(key, JSON.stringify({
+      ...JSON.parse(page),
+      totalSignups: parseInt(count),
+    }));
+
+    res.status(200).json({ ok: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Encountered error setting page count' });
   }
 });
 
