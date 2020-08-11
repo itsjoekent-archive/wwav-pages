@@ -3,7 +3,10 @@ const theme = {
     blue: '#28B2FF',
     navy: '#1B0E44',
     purple: '#8A76CA',
+    darkPurple: '#5e44b0',
     white: '#FFFFFF',
+    gray: '#b2baba',
+    darkGray: '#8a9696',
     red: '#FF2846',
   },
   fonts: {

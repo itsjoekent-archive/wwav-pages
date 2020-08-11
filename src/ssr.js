@@ -84,7 +84,7 @@ const htmlLayout = `
 </html>
 `;
 
-export default async function ssr(path) {
+export default async function ssr(path, client) {
   const embeddedData = {
     pageType: null,
   };
@@ -92,6 +92,19 @@ export default async function ssr(path) {
   if (path === '/') {
     embeddedData.pageType = BUILD_PAGE_TYPE;
     // ...
+  } else {
+    const slug = path.replace('/', '').toLowerCase();
+    const key = `page::${slug}`;
+
+    const page = await client.get(key);
+
+    if (page) {
+      const data = JSON.parse(page);
+      delete data.email;
+
+      embeddedData.pageFields = data;
+      embeddedData.pageType = REGISTER_PAGE_TYPE;
+    }
   }
 
   const sheet = new ServerStyleSheet();

@@ -214,12 +214,96 @@ const FormFieldSplitLayout = styled.div`
   }
 `;
 
+const GifResetButton = styled.button`
+  font-family: ${({ theme }) => theme.fonts.openSans};
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.1;
+  color: ${({ theme }) => theme.colors.gray};
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 12px;
+
+  border: 2px solid ${({ theme }) => theme.colors.gray};
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 4px;
+
+  cursor: pointer;
+
+  padding: 6px 12px;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.darkGray};
+    border: 2px solid ${({ theme }) => theme.colors.darkGray};
+  }
+`;
+
+const SubmissionRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+const SubmitPrompt = styled.h3`
+  font-family: ${({ theme }) => theme.fonts.openSans};
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.1;
+  color: ${({ theme }) => theme.colors.navy};
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+`;
+
+const SubmitButton = styled.button`
+  font-family: ${({ theme }) => theme.fonts.openSans};
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1.1;
+  color: ${({ theme }) => theme.colors.white};
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  background: ${({ theme }) => theme.colors.purple};
+  border-radius: 4px;
+
+  cursor: pointer;
+  border: none;
+
+  padding: 12px 24px;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.darkPurple};
+  }
+`;
+
+const SubmissionError = styled.p`
+  font-family: ${({ theme }) => theme.fonts.openSans};
+  font-size: 18px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.red};
+  line-height: 1.2;
+  text-align: center;
+  margin-top: 24px;
+`;
+
 const labelMap = {
   firstName: 'First name',
   lastName: 'Last name',
   email: 'Email',
   slug: 'Page URL',
   title: 'Title',
+  promptAnswer: 'Voting prompt',
 };
 
 export default function BuildPage() {
@@ -232,6 +316,9 @@ export default function BuildPage() {
       validation: {},
       hasPrefilled: {},
       hideGifGallery: false,
+      hasSubmitted: false,
+      formError: null,
+      isSlugTaken: false,
     },
   );
 
@@ -304,9 +391,17 @@ export default function BuildPage() {
       'email',
       'slug',
       'title',
+      'promptAnswer',
     ];
 
-    const validation = {};
+    const validation = {
+      firstName: null,
+      lastName: null,
+      email: null,
+      title: null,
+      promptAnswer: null,
+      slug: null,
+    };
 
     required.forEach((key) => {
       if (!state.values[key]) {
@@ -326,17 +421,28 @@ export default function BuildPage() {
       validation['slug'] = 'Page path must be 30 characters or less.';
     }
 
+    if (!validation['slug'] && state.isSlugTaken) {
+      validation['slug'] = 'Sorry, this path is already in use!';
+    }
+
     if (!validation['title'] && (state.values['title'] || '').length > 140) {
       validation['title'] = 'Page title must be 140 characters or less.';
     }
 
-    if (JSON.stringify(validation) !== JSON.stringify(state.validation)) {
-      dispatch((copy) => ({ ...copy, validation }));
+    if (!validation['promptAnswer'] && (state.values['promptAnswer'] || '').length > 2000) {
+      validation['promptAnswer'] = 'Response must be 2000 characters or less.';
+    }
+
+    const newValidation = { ...state.validation, ...validation };
+
+    if (JSON.stringify(newValidation) !== JSON.stringify(state.validation)) {
+      dispatch((copy) => ({ ...copy, validation: newValidation }));
     }
   }, [
     dispatch,
     state.values,
     state.validation,
+    state.isSlugTaken,
   ]);
 
   React.useEffect(() => {
@@ -387,27 +493,13 @@ export default function BuildPage() {
           return;
         }
 
-        if (response.status === 200 && !state.validation['slug']) {
-          dispatch((copy) => ({
-            ...copy,
-            validation: {
-              ...copy.validation,
-              slug: 'Sorry, this path is already in use!',
-            },
-          }));
-
+        if (response.status === 200) {
+          dispatch((copy) => ({ ...copy, isSlugTaken: true }));
           return;
         }
 
-        if (response.status === 404 && state.validation.slug) {
-          dispatch((copy) => ({
-            ...copy,
-            validation: {
-              ...copy.validation,
-              slug: null,
-            },
-          }));
-
+        if (response.status === 404) {
+          dispatch((copy) => ({ ...copy, isSlugTaken: false }));
           return;
         }
       } catch (error) {
@@ -424,7 +516,7 @@ export default function BuildPage() {
   }, [
     dispatch,
     state.values.slug,
-    state.validation.slug,
+    state.isSlugTaken,
   ]);
 
   React.useEffect(() => {
@@ -449,6 +541,52 @@ export default function BuildPage() {
     previousValues.gifQuery,
   ]);
 
+  React.useEffect(() => {
+    if (!state.hasSubmitted) {
+      return;
+    }
+
+    let cancel = false;
+
+    async function submit() {
+      try {
+        const response = await fetch('/api/page', {
+          method: 'post',
+          body: JSON.stringify(state.values),
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        const json = await response.json();
+
+        if (json.error) {
+          dispatch((copy) => ({
+            ...copy,
+            hasSubmitted: false,
+            formError: json.error,
+          }));
+          return;
+        }
+
+        if (response.status !== 200) {
+          throw new Error('Failed server response');
+        }
+
+        console.log(json);
+        window.location = `/${json.page.slug}`;
+      } catch (error) {
+        console.error(error);
+        dispatch((copy) => ({ ...copy, formError: 'Encountered error submitting form. Try again?' }))
+      }
+    }
+
+    submit();
+    return () => cancel = true;
+  }, [
+    dispatch,
+    state.hasSubmitted,
+    state.values,
+  ]);
+
   function onGifClick(gif, event) {
     event.preventDefault();
     dispatch((copy) => ({
@@ -462,13 +600,46 @@ export default function BuildPage() {
     }));
   }
 
+  function resetGif() {
+    dispatch((copy) => ({
+      ...copy,
+      hideGifGallery: false,
+      values: {
+        ...copy.values,
+        gifUrl: null,
+        gifTitle: null,
+      },
+    }));
+  }
+
+  function onSubmit(event) {
+    event.preventDefault();
+
+    dispatch((copy) => ({
+      ...copy,
+      hasSubmitted: true,
+      formError: null,
+      hasFocusedOnce: {
+        ...copy.hasFocusedOnce,
+        email: true,
+        firstName: true,
+        lastName: true,
+        title: true,
+        slug: true,
+        promptAnswer: true,
+      },
+    }));
+  }
+
+  console.log(state);
+
   return (
     <React.Fragment>
       <Banner />
       <Page>
         <Title>Create your own voter registration page</Title>
         <LineBreak />
-        <form>
+        <form onSubmit={onSubmit}>
           <FormFieldContainer>
             <FormQuestionColumn>
               <FormQuestionStep>step 1.</FormQuestionStep>
@@ -557,24 +728,36 @@ export default function BuildPage() {
               <FormQuestionText>Pick your favorite Gif to grab their attention!</FormQuestionText>
             </FormQuestionColumn>
             <FormFieldVerticalLayout>
-              <FormInputColumn>
-                <FormLabel hasError={shouldShowError('gifQuery')}>Search Giphy</FormLabel>
-                <SingleLineTextInput {...textFieldPropsGenerator('gifQuery')} />
-                {shouldShowError('gifQuery') && <FormError>{state.validation['gifQuery']}</FormError>}
-              </FormInputColumn>
               {!state.hideGifGallery && (
-                <Carousel
-                  gifHeight={200}
-                  fetchGifs={(offset) => giphyFetch.search(state.values.gifQuery, { offset, limit: 10, rating: 'g' })}
-                  hideAttribution={true}
-                  onGifClick={onGifClick}
-                />
+                <React.Fragment>
+                  <FormInputColumn>
+                    <FormLabel hasError={shouldShowError('gifQuery')}>Search Giphy</FormLabel>
+                    <SingleLineTextInput {...textFieldPropsGenerator('gifQuery')} />
+                    {shouldShowError('gifQuery') && <FormError>{state.validation['gifQuery']}</FormError>}
+                  </FormInputColumn>
+                  <Carousel
+                    gifHeight={200}
+                    fetchGifs={(offset) => giphyFetch.search(state.values.gifQuery, { offset, limit: 10, rating: 'g' })}
+                    hideAttribution={true}
+                    onGifClick={onGifClick}
+                  />
+                </React.Fragment>
               )}
               {state.values.gifUrl && (
-                <img src={state.values.gifUrl} alt={state.values.gifTitle} />
+                <React.Fragment>
+                  <img src={state.values.gifUrl} alt={state.values.gifTitle} />
+                  <GifResetButton onClick={resetGif}>Pick a different gif</GifResetButton>
+                </React.Fragment>
               )}
             </FormFieldVerticalLayout>
           </FormFieldContainer>
+          <SubmissionRow>
+            <SubmitPrompt>Ready to share?</SubmitPrompt>
+            <SubmitButton type="submit">publish</SubmitButton>
+            {state.formError && (
+              <SubmissionError>{state.formError}</SubmissionError>
+            )}
+          </SubmissionRow>
         </form>
       </Page>
     </React.Fragment>
