@@ -494,7 +494,15 @@ export default function BuildPage() {
         }
 
         if (response.status === 200) {
-          dispatch((copy) => ({ ...copy, isSlugTaken: true }));
+          dispatch((copy) => ({
+            ...copy,
+            isSlugTaken: true,
+            hasFocusedOnce: {
+              ...copy.hasFocusedOnce,
+              slug: true,
+            },
+          }));
+
           return;
         }
 
@@ -571,7 +579,6 @@ export default function BuildPage() {
           throw new Error('Failed server response');
         }
 
-        console.log(json);
         window.location = `/${json.page.slug}`;
       } catch (error) {
         console.error(error);
@@ -630,8 +637,6 @@ export default function BuildPage() {
       },
     }));
   }
-
-  console.log(state);
 
   return (
     <React.Fragment>
