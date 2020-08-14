@@ -22,9 +22,23 @@ const Text = styled.p`
 `;
 
 export default function Banner() {
+  const electionDay = new Date('11/03/2020');
+  const difference = electionDay.getTime() - Date.now();
+  const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+
+  let message = `${days} day${days > 1 ? 's' : ''} until election day. Are you registered to vote?`;
+
+  if (days === 0) {
+    message = 'Today is election day, make sure your voice is heard.';
+  }
+
+  if (days < 0) {
+    message = 'The election happened.';
+  }
+
   return (
     <Container>
-      <Text>30 days until election day. Are you registered to vote?</Text>
+      <Text>{message}</Text>
     </Container>
   );
 }
