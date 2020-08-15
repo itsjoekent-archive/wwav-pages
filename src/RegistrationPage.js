@@ -1,6 +1,42 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import Banner from './Banner';
+
+const EmbedContainer = styled.div`
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+const EmbedTitle = styled.h1`
+  font-family: ${({ theme }) => theme.fonts.openSans};
+  font-weight: 900;
+  font-size: 32px;
+  line-height: 1.1;
+  text-align: center;
+  color: ${({ theme }) => theme.colors.navy};
+  margin-bottom: 16px;
+
+  @media (min-width: 1024px) {
+    font-size: 48px;
+    margin-bottom: 18px;
+  }
+`;
+
+const fadeOutFrames = keyframes`
+  from { opacity: 1; }
+  to { opacity: 0; }
+`;
+
+const fadeInFrames = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
 
 const Page = styled.main`
   display: flex;
@@ -19,6 +55,22 @@ const Page = styled.main`
     flex-direction: row;
     justify-content: space-between;
   }
+
+  ${({ isFadingIn }) => isFadingIn && css`
+    opacity: 0;
+    animation: ${fadeInFrames} 0.5s forwards;
+  `}
+
+  ${({ isFadingOut }) => isFadingOut && css`
+    opacity: 1;
+    animation: ${fadeOutFrames} 0.5s forwards;
+  `}
+
+  ${({ isRegistering }) => isRegistering && css`
+    ${EmbedContainer} {
+      display: flex;
+    }
+  `}
 `;
 
 const ImageColumn = styled.div`
@@ -173,6 +225,89 @@ export default function RegistrationPage(props) {
     },
   } = props;
 
+  const [isRegistering, setIsRegistering] = React.useState(false);
+  const [isFadingIn, setisFadingIn] = React.useState(false);
+  const [isFadingOut, setIsFadingOut] = React.useState(false);
+  const [iframeUrl, setIframeUrl] = React.useState(null);
+
+  const embedContainerRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const script = window.document.createElement('script');
+
+    script.onload = function onLoad() {
+      if (typeof window.iFrameResize !== 'undefined') {
+        iFrameResize({ log: false, checkOrigin: false }, `#rtv-iframe`);
+      }
+    }
+
+    const scriptUrl = "//s3.amazonaws.com/rocky-assets/assets/iframeResizer.min-ce97b888b19f31ac300ddea612953fa47c786ad20eb5194df2db64df3536c2ed.js";
+    script.src = scriptUrl;
+    window.document.head.appendChild(script);
+  }, []);
+
+  React.useEffect(() => {
+    if (isFadingOut && !isRegistering) {
+      const timeoutId = setTimeout(() => {
+        setIsRegistering(true);
+        setIsFadingOut(false);
+        setisFadingIn(true);
+      }, 500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [
+    isFadingOut,
+    setIsFadingOut,
+    setisFadingIn,
+    isRegistering,
+    setIsRegistering,
+  ]);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (!iframeUrl) {
+      // Modified from: https://register.rockthevote.com/assets/rtv-iframe.js
+      function makeIframeUrl(params) {
+        params = params || {};
+
+        var queryString = '';
+        if (typeof params === 'object') {
+          var keys = Object.keys(params);
+
+          for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var value = params[key];
+
+            if (queryString != '') {
+              queryString = queryString + '&';
+            }
+
+            queryString = queryString + key + '=' + value;
+          }
+        }
+
+        var baseUrl = 'https://register.rockthevote.com';
+        var url = baseUrl;
+
+        if (queryString !== '') {
+          url = url + '?' + queryString;
+        }
+
+        return url;
+      };
+
+      setIframeUrl(makeIframeUrl({ partner: 37284, tracking: `msv-custom-${slug}` }));
+    }
+  }, [
+    iframeUrl,
+    setIframeUrl,
+    slug,
+  ]);
+
   const highlightTitle = totalSignups
     ? `${firstName} has registered ${totalSignups} new voter${totalSignups > 1 ? 's' : ''} voters so far!`
     : `${firstName} is trying to reigster 20 new voters before election day`;
@@ -180,21 +315,29 @@ export default function RegistrationPage(props) {
   return (
     <React.Fragment>
       <Banner />
-      <Page>
-        <ImageColumn>
-          <img src={gifUrl} alt={gifTitle} />
-        </ImageColumn>
-        <ContentColumn>
-          <Title>{title}</Title>
-          <Byline>Created by <strong>{firstName} {lastName}</strong></Byline>
-          <PromptTitle>Why voting is important to me</PromptTitle>
-          <PromptResponse>{promptAnswer}</PromptResponse>
-          <HighlightBox>
-            <HighlightTitle>{highlightTitle}</HighlightTitle>
-            <HighlightCopy>Make sure you and all of your friends  are registered to vote by using our online voter registration form and sharing this page.</HighlightCopy>
-            <RegisterButton>register to vote</RegisterButton>
-          </HighlightBox>
-        </ContentColumn>
+      <Page isRegistering={isRegistering} isFadingIn={isFadingIn} isFadingOut={isFadingOut}>
+        <EmbedContainer ref={embedContainerRef}>
+          <EmbedTitle>Register to vote</EmbedTitle>
+          <iframe id="rtv-iframe" src={iframeUrl} width="100%" height="600px" frameBorder="0" />
+        </EmbedContainer>
+        {!isRegistering && (
+          <React.Fragment>
+            <ImageColumn>
+              <img src={gifUrl} alt={gifTitle} />
+            </ImageColumn>
+            <ContentColumn>
+              <Title>{title}</Title>
+              <Byline>Created by <strong>{firstName} {lastName}</strong></Byline>
+              <PromptTitle>Why voting is important to me</PromptTitle>
+              <PromptResponse>{promptAnswer}</PromptResponse>
+              <HighlightBox>
+                <HighlightTitle>{highlightTitle}</HighlightTitle>
+                <HighlightCopy>Make sure you and all of your friends  are registered to vote by using our online voter registration form and sharing this page.</HighlightCopy>
+                <RegisterButton onClick={() => setIsFadingOut(true)}>register to vote</RegisterButton>
+              </HighlightBox>
+            </ContentColumn>
+          </React.Fragment>
+        )}
       </Page>
     </React.Fragment>
   );

@@ -26,15 +26,21 @@ export default function Banner() {
   const difference = electionDay.getTime() - Date.now();
   const days = Math.floor(difference / (1000 * 60 * 60 * 24));
 
-  let message = `${days} day${days > 1 ? 's' : ''} until election day. Are you registered to vote?`;
+  const [message, setMessage] = React.useState('');
 
-  if (days === 0) {
-    message = 'Today is election day, make sure your voice is heard.';
-  }
+  React.useEffect(() => {
+    let update = `${days} day${days > 1 ? 's' : ''} until election day. Are you registered to vote?`;
 
-  if (days < 0) {
-    message = 'The election happened.';
-  }
+    if (days === 0) {
+      update = 'Today is election day, make sure your voice is heard.';
+    }
+
+    if (days < 0) {
+      update = 'The election happened.';
+    }
+
+    setMessage(update);
+  }, []);
 
   return (
     <Container>
