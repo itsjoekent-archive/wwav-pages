@@ -1,19 +1,22 @@
 const { randomBytes } = require('crypto');
 const express = require('express');
 const secure = require('express-force-https');
+const rateLimit = require('express-rate-limit');
+const basicAuth = require('express-basic-auth');
 const cors = require('cors');
 const xss = require('xss');
 const asyncRedis = require('async-redis');
-const rateLimit = require('express-rate-limit');
 const RateLimitRedisStore = require('rate-limit-redis');
 const Filter = require('bad-words');
 
 const { default: ssr } = require('./ssr-compiled');
 
-const { IS_PROD, PORT, REDIS_URL, API_TOKEN } = process.env;
+const { IS_PROD, PORT, REDIS_URL, API_TOKEN, ADMIN_PASS } = process.env;
 
 const app = express();
 const filter = new Filter();
+
+const BASIC_AUTH = { challenge: true, users: { 'admin': ADMIN_PASS } };
 
 if (IS_PROD) {
   app.use(secure);
@@ -200,7 +203,7 @@ app.post('/api/page/:slug/count', async function (req, res) {
       return;
     }
 
-    const key = `page::${formatSlug(slug.replace('/', ''))}`
+    const key = `page::${formatSlug(slug.replace('/', ''))}`;
     const page = await client.get(key);
 
     if (!page) {
@@ -225,7 +228,25 @@ app.post('/api/page/:slug/count', async function (req, res) {
   }
 });
 
-// TODO: A secret delete path
+app.get('/:slug/delete', basicAuth(BASIC_AUTH), async function (req, res) {
+  try {
+    const { params: { slug } } = req;
+
+    const key = `page::${formatSlug(slug.replace('/', ''))}`;
+    const page = await client.get(key);
+
+    if (!page) {
+      res.status(404).send('Page does not exist!');
+      return;
+    }
+
+    await client.del(key);
+    res.status(200).send('Deleted! Poof!');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Whoops, had an error. Try again?');
+  }
+});
 
 app.get('*', async function (req, res) {
   try {
