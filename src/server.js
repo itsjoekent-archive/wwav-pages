@@ -6,12 +6,14 @@ const xss = require('xss');
 const asyncRedis = require('async-redis');
 const rateLimit = require('express-rate-limit');
 const RateLimitRedisStore = require('rate-limit-redis');
+const Filter = require('bad-words');
 
 const { default: ssr } = require('./ssr-compiled');
 
 const { IS_PROD, PORT, REDIS_URL, API_TOKEN } = process.env;
 
 const app = express();
+const filter = new Filter();
 
 if (IS_PROD) {
   app.use(secure);
@@ -82,12 +84,12 @@ app.post('/api/page', async function (req, res) {
     } = req.body;
 
     const labelMap = {
-      firstName: 'First name',
-      lastName: 'Last name',
-      email: 'Email',
-      slug: 'Page URL',
-      title: 'Title',
-      promptAnswer: 'Voting prompt',
+      firstName: 'first name',
+      lastName: 'last name',
+      email: 'email',
+      slug: 'page URL',
+      title: 'title',
+      promptAnswer: 'voting prompt',
     };
 
     const required = [
@@ -103,34 +105,46 @@ app.post('/api/page', async function (req, res) {
 
     required.forEach((key) => {
       if (!req.body[key]) {
-        validation[key] = `${labelMap[key]} is required.`;
+        validation[key] = `${labelMap[key]} is required`;
       }
     });
 
     if (!validation['email'] && !/\S+@\S+\.\S+/.test(email)) {
-      validation['email'] = 'Incorrect email format.';
+      validation['email'] = 'incorrect email format';
     }
 
     if (!validation['slug'] && !/^[a-zA-Z0-9-_]+$/.test(slug)) {
-      validation['slug'] = 'Page URL can only contain letters, numbers, dashes and underscores.';
+      validation['slug'] = 'page URL can only contain letters, numbers, dashes and underscores';
     }
 
     if (!validation['slug'] && (slug || '').length > 30) {
-      validation['slug'] = 'Page path must be 30 characters or less.';
+      validation['slug'] = 'page path must be 30 characters or less';
     }
 
     if (!validation['title'] && (title || '').length > 140) {
-      validation['title'] = 'Page title must be 140 characters or less.';
+      validation['title'] = 'page title must be 140 characters or less';
     }
 
     if (!validation['promptAnswer'] && (promptAnswer || '').length > 2000) {
-      validation['promptAnswer'] = 'Response must be 2000 characters or less.';
+      validation['promptAnswer'] = 'response must be 2000 characters or less';
     }
 
-    // TODO: Profanity filter
+    const profanityCheck = [
+      'firstName',
+      'lastName',
+      'slug',
+      'title',
+      'promptAnswer',
+    ];
+
+    profanityCheck.forEach((key) => {
+      if (!validation[key] && filter.isProfane(req.body[key])) {
+        validation[key] = `${labelMap[key]} cannot have profanity`;
+      }
+    });
 
     if (gifUrl && !gifUrl.includes('.giphy.com')) {
-      validation['gifUrl'] = 'Must be a Giphy link.';
+      validation['gifUrl'] = 'must be a Giphy link';
     }
 
     const formattedSlug = formatSlug(slug);
@@ -139,11 +153,15 @@ app.post('/api/page', async function (req, res) {
     const slugExists = await client.exists(key);
 
     if (slugExists && !validation['slug']) {
-      validation['slug'] = 'Sorry, this path is already in use!';
+      validation['slug'] = 'this path is already in use';
     }
 
     if (Object.values(validation).length) {
-      res.status(400).json({ error: Object.values(validation).join(', ') });
+      const validationValues = Object.values(validation);
+      const joinedValidationMessage = `${validationValues.join(validationValues.length > 1 ? ', ' : '')}.`;
+      const validationMessage = joinedValidationMessage.charAt(0).toUpperCase() + joinedValidationMessage.slice(1);
+
+      res.status(400).json({ error: validationMessage });
       return;
     }
 
