@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import BuildPage from './BuildPage';
 import RegistrationPage from './RegistrationPage';
+import NotFoundPage from './NotFoundPage';
 import Banner from './Banner';
 import Footer from './Footer';
 import theme from './theme';
@@ -30,7 +31,7 @@ export default function Application(props) {
       case REGISTER_PAGE_TYPE:
         return <RegistrationPage {...props} />;
       default:
-        return <React.Fragment><h1>404</h1></React.Fragment>;
+        return <NotFoundPage />;
     }
   }
 

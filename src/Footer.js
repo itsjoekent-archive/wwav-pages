@@ -70,7 +70,7 @@ export default function Footer() {
   return (
     <Layout>
       <a href="https://www.whenweallvote.org/">
-        <img src="/logo.png" />
+        <img src="/logo.png" alt="When We All Vote logo" />
       </a>
       <LegalContainer>
         <LegalLinksRow>

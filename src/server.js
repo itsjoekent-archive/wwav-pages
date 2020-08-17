@@ -1,3 +1,4 @@
+const { randomBytes } = require('crypto');
 const express = require('express');
 const secure = require('express-force-https');
 const cors = require('cors');
@@ -219,10 +220,79 @@ app.get('*', async function (req, res) {
     res.set('Content-Type', 'text/html');
     res.send(result);
   } catch (error) {
+    const errorId = randomBytes(8).toString('hex');
+    error.message = error.message ? `[errorId=${errorId}] ${error.message}` : `[[errorId=${errorId}]] unspecified error message`;
+
     console.error(error);
 
     res.set('Content-Type', 'text/html');
-    res.status(500).send('error!!!');
+    res.status(500).send(`
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+          <title>Server error!</title>
+          <meta name="title" content="Create your own voter registration page" />
+          <meta name="og:title" content="Create your own voter registration page" />
+          <meta name="twitter:title" content="Create your own voter registration page" />
+          <meta name="description" content="Join When We All Vote to make sure every eligible voter is registered and ready to vote in every election." />
+          <meta name="og:description" content="Join When We All Vote to make sure every eligible voter is registered and ready to vote in every election." />
+          <meta name="twitter:description" content="Join When We All Vote to make sure every eligible voter is registered and ready to vote in every election." />
+
+          <meta property="og:image" content="https://www.whenweallvote.org/wp-content/uploads/2019/06/wwav_meta_mo_nophone.png">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:image" content="https://www.whenweallvote.org/wp-content/uploads/2019/06/wwav_meta_mo_nophone.png">
+
+          <link rel="icon" type="image/x-icon" href="https://www.whenweallvote.org/wp-content/themes/whenwevote/favicon.png">
+
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;900&family=Open+Sans:wght@300;400;600;700;800&display=swap');
+
+            body {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              width: 100vw;
+              height: 100vh;
+              margin: 0;
+              padding: 0;
+              background-color: #1B0E44;
+            }
+
+            h1 {
+              font-family: 'Open Sans', sans-serif;
+              font-weight: 700;
+              font-size: 24px;
+              line-height: 1.1;
+              color: #FFFFFF;
+              text-align: center;
+              padding: 24px;
+            }
+
+            p {
+              font-family: 'Open Sans', sans-serif;
+              font-weight: 400;
+              font-size: 12px;
+              color: #FFFFFF;
+              text-align: center;
+            }
+
+            @media (min-width: 1024px) {
+              h1 {
+                font-size: 36px;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>We're experiencing some server errors, hang tight!</h1>
+          <p>Error ID: ${errorId}</p>
+        </body>
+      </html>
+    `);
   }
 });
 
