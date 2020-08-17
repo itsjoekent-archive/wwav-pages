@@ -1,5 +1,6 @@
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
+import { Helmet } from 'react-helmet';
 
 const EmbedContainer = styled.div`
   display: none;
@@ -313,6 +314,15 @@ export default function RegistrationPage(props) {
 
   return (
     <Page isRegistering={isRegistering} isFadingIn={isFadingIn} isFadingOut={isFadingOut}>
+      <Helmet>
+        <title>{title}</title>
+        <meta name="title" content={title} />
+        <meta name="og:title" content={title} />
+        <meta name="twitter:title" content={title} />
+        <meta name="description" content={promptAnswer} />
+        <meta name="og:description" content={promptAnswer} />
+        <meta name="twitter:description" content={promptAnswer} />
+      </Helmet>
       <EmbedContainer ref={embedContainerRef}>
         <EmbedTitle>Register to vote</EmbedTitle>
         <iframe id="rtv-iframe" src={iframeUrl} width="100%" height="600px" frameBorder="0" />

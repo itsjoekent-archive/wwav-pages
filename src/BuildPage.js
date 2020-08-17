@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { Carousel } from '@giphy/react-components';
 import { GiphyFetch } from '@giphy/js-fetch-api';
+import DefaultMeta from './DefaultMeta';
 
 const giphyFetch = new GiphyFetch(process.env.GIPHY_SDK_KEY);
 
@@ -639,6 +640,7 @@ export default function BuildPage() {
 
   return (
     <Page>
+      <DefaultMeta />
       <Title>Create your own voter registration page</Title>
       <LineBreak />
       <form onSubmit={onSubmit}>

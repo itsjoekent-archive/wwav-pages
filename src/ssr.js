@@ -12,12 +12,13 @@ const htmlLayout = `
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <meta property="og:image" content="https://www.whenweallvote.org/wp-content/uploads/2019/06/wwav_meta_mo_nophone.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://www.whenweallvote.org/wp-content/uploads/2019/06/wwav_meta_mo_nophone.png">
+
     {{HEAD}}
 
-    <link rel="icon" href="https://www.edmarkey.com/wp-content/uploads/cropped-favicon-32x32.jpg" sizes="32x32">
-    <link rel="icon" href="https://www.edmarkey.com/wp-content/uploads/cropped-favicon-192x192.jpg" sizes="192x192">
-    <link rel="apple-touch-icon-precomposed" href="https://www.edmarkey.com/wp-content/uploads/cropped-favicon-180x180.jpg">
-    <meta name="msapplication-TileImage" content="https://www.edmarkey.com/wp-content/uploads/cropped-favicon-270x270.jpg">
+    <link rel="icon" type="image/x-icon" href="https://www.whenweallvote.org/wp-content/themes/whenwevote/favicon.png">
 
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;900&family=Open+Sans:wght@300;400;600;700;800&display=swap');
