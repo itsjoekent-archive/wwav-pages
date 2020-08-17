@@ -1,6 +1,5 @@
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
-import Banner from './Banner';
 
 const EmbedContainer = styled.div`
   display: none;
@@ -313,32 +312,29 @@ export default function RegistrationPage(props) {
     : `${firstName} is trying to reigster 20 new voters before election day`;
 
   return (
-    <React.Fragment>
-      <Banner />
-      <Page isRegistering={isRegistering} isFadingIn={isFadingIn} isFadingOut={isFadingOut}>
-        <EmbedContainer ref={embedContainerRef}>
-          <EmbedTitle>Register to vote</EmbedTitle>
-          <iframe id="rtv-iframe" src={iframeUrl} width="100%" height="600px" frameBorder="0" />
-        </EmbedContainer>
-        {!isRegistering && (
-          <React.Fragment>
-            <ImageColumn>
-              <img src={gifUrl} alt={gifTitle} />
-            </ImageColumn>
-            <ContentColumn>
-              <Title>{title}</Title>
-              <Byline>Created by <strong>{firstName} {lastName}</strong></Byline>
-              <PromptTitle>Why voting is important to me</PromptTitle>
-              <PromptResponse>{promptAnswer}</PromptResponse>
-              <HighlightBox>
-                <HighlightTitle>{highlightTitle}</HighlightTitle>
-                <HighlightCopy>Make sure you and all of your friends  are registered to vote by using our online voter registration form and sharing this page.</HighlightCopy>
-                <RegisterButton onClick={() => setIsFadingOut(true)}>register to vote</RegisterButton>
-              </HighlightBox>
-            </ContentColumn>
-          </React.Fragment>
-        )}
-      </Page>
-    </React.Fragment>
+    <Page isRegistering={isRegistering} isFadingIn={isFadingIn} isFadingOut={isFadingOut}>
+      <EmbedContainer ref={embedContainerRef}>
+        <EmbedTitle>Register to vote</EmbedTitle>
+        <iframe id="rtv-iframe" src={iframeUrl} width="100%" height="600px" frameBorder="0" />
+      </EmbedContainer>
+      {!isRegistering && (
+        <React.Fragment>
+          <ImageColumn>
+            <img src={gifUrl} alt={gifTitle} />
+          </ImageColumn>
+          <ContentColumn>
+            <Title>{title}</Title>
+            <Byline>Created by <strong>{firstName} {lastName}</strong></Byline>
+            <PromptTitle>Why voting is important to me</PromptTitle>
+            <PromptResponse>{promptAnswer}</PromptResponse>
+            <HighlightBox>
+              <HighlightTitle>{highlightTitle}</HighlightTitle>
+              <HighlightCopy>Make sure you and all of your friends  are registered to vote by using our online voter registration form and sharing this page.</HighlightCopy>
+              <RegisterButton onClick={() => setIsFadingOut(true)}>register to vote</RegisterButton>
+            </HighlightBox>
+          </ContentColumn>
+        </React.Fragment>
+      )}
+    </Page>
   );
 }

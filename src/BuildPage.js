@@ -2,7 +2,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { Carousel } from '@giphy/react-components';
 import { GiphyFetch } from '@giphy/js-fetch-api';
-import Banner from './Banner';
 
 const giphyFetch = new GiphyFetch(process.env.GIPHY_SDK_KEY);
 
@@ -639,132 +638,131 @@ export default function BuildPage() {
   }
 
   return (
-    <React.Fragment>
-      <Banner />
-      <Page>
-        <Title>Create your own voter registration page</Title>
-        <LineBreak />
-        <form onSubmit={onSubmit}>
-          <FormFieldContainer>
-            <FormQuestionColumn>
-              <FormQuestionStep>step 1.</FormQuestionStep>
-              <FormQuestionText>What’s your name?</FormQuestionText>
-            </FormQuestionColumn>
-            <FormFieldSplitLayout>
-              <FormInputColumn>
-                <FormLabel hasError={shouldShowError('firstName')}>First name</FormLabel>
-                <SingleLineTextInput {...textFieldPropsGenerator('firstName')} />
-                {shouldShowError('firstName') && <FormError>{state.validation['firstName']}</FormError>}
-              </FormInputColumn>
-              <FormInputColumn>
-                <FormLabel hasError={shouldShowError('lastName')}>Last name</FormLabel>
-                <SingleLineTextInput {...textFieldPropsGenerator('lastName')} />
-                {shouldShowError('lastName') && <FormError>{state.validation['lastName']}</FormError>}
-              </FormInputColumn>
-            </FormFieldSplitLayout>
-          </FormFieldContainer>
-          <FormFieldContainer>
-            <FormQuestionColumn>
-              <FormQuestionStep>step 2.</FormQuestionStep>
-              <FormQuestionText>What’s your email?</FormQuestionText>
-            </FormQuestionColumn>
-            <FormFieldVerticalLayout>
-              <FormInputColumn>
-                <FormLabel hasError={shouldShowError('email')}>Email</FormLabel>
-                <SingleLineTextInput {...textFieldPropsGenerator('email')} />
-                {shouldShowError('email') && <FormError>{state.validation['email']}</FormError>}
-              </FormInputColumn>
-            </FormFieldVerticalLayout>
-          </FormFieldContainer>
-          <FormFieldContainer>
-            <FormQuestionColumn>
-              <FormQuestionStep>step 3.</FormQuestionStep>
-              <FormQuestionText>What do you want the URL  of your page to be?</FormQuestionText>
-            </FormQuestionColumn>
-            <FormFieldVerticalLayout>
-              <FormInputColumn>
-                <FormLabelRow>
-                  <FormLabel hasError={shouldShowError('slug')}>Page URL</FormLabel>
-                  <FormWordCount hasError={shouldShowError('slug')}>({(state.values['slug'] || '').length}/30)</FormWordCount>
-                </FormLabelRow>
-                <SingleLineTextInput {...textFieldPropsGenerator('slug')} />
-                {shouldShowError('slug') && <FormError>{state.validation['slug']}</FormError>}
-                {!shouldShowError('slug') && state.values['slug'] && (
-                  <FormInfo>Your page will be located at <strong>https://register.whenweallvote.org/{encodeURIComponent(state.values['slug'])}</strong></FormInfo>
-                )}
-              </FormInputColumn>
-            </FormFieldVerticalLayout>
-          </FormFieldContainer>
-          <FormFieldContainer>
-            <FormQuestionColumn>
-              <FormQuestionStep>step 4.</FormQuestionStep>
-              <FormQuestionText>Set the title of your page, get creative!</FormQuestionText>
-            </FormQuestionColumn>
-            <FormFieldVerticalLayout>
-              <FormInputColumn>
-                <FormLabelRow>
-                  <FormLabel hasError={shouldShowError('title')}>Title</FormLabel>
-                  <FormWordCount hasError={shouldShowError('title')}>({(state.values['title'] || '').length}/140)</FormWordCount>
-                </FormLabelRow>
-                <SingleLineTextInput {...textFieldPropsGenerator('title')} />
-                {shouldShowError('title') && <FormError>{state.validation['title']}</FormError>}
-              </FormInputColumn>
-            </FormFieldVerticalLayout>
-          </FormFieldContainer>
-          <FormFieldContainer>
-            <FormQuestionColumn>
-              <FormQuestionStep>step 5.</FormQuestionStep>
-              <FormQuestionText>Share why voting is important to you.</FormQuestionText>
-            </FormQuestionColumn>
-            <FormFieldVerticalLayout>
-              <FormInputColumn>
-                <FormLabelRow>
-                  <FormLabel hasError={shouldShowError('promptAnswer')}>why is voting important to you?</FormLabel>
-                  <FormWordCount hasError={shouldShowError('promptAnswer')}>({(state.values['promptAnswer'] || '').length}/2000)</FormWordCount>
-                </FormLabelRow>
-                <MultiLineTextInput rows="4" {...textFieldPropsGenerator('promptAnswer')} />
-                {shouldShowError('promptAnswer') && <FormError>{state.validation['promptAnswer']}</FormError>}
-              </FormInputColumn>
-            </FormFieldVerticalLayout>
-          </FormFieldContainer>
-          <FormFieldContainer>
-            <FormQuestionColumn>
-              <FormQuestionStep>step 6.</FormQuestionStep>
-              <FormQuestionText>Pick your favorite Gif to grab their attention!</FormQuestionText>
-            </FormQuestionColumn>
-            <FormFieldVerticalLayout>
-              {!state.hideGifGallery && (
-                <React.Fragment>
-                  <FormInputColumn>
-                    <FormLabel hasError={shouldShowError('gifQuery')}>Search Giphy</FormLabel>
-                    <SingleLineTextInput {...textFieldPropsGenerator('gifQuery')} />
-                    {shouldShowError('gifQuery') && <FormError>{state.validation['gifQuery']}</FormError>}
-                  </FormInputColumn>
+    <Page>
+      <Title>Create your own voter registration page</Title>
+      <LineBreak />
+      <form onSubmit={onSubmit}>
+        <FormFieldContainer>
+          <FormQuestionColumn>
+            <FormQuestionStep>step 1.</FormQuestionStep>
+            <FormQuestionText>What’s your name?</FormQuestionText>
+          </FormQuestionColumn>
+          <FormFieldSplitLayout>
+            <FormInputColumn>
+              <FormLabel hasError={shouldShowError('firstName')}>First name</FormLabel>
+              <SingleLineTextInput {...textFieldPropsGenerator('firstName')} />
+              {shouldShowError('firstName') && <FormError>{state.validation['firstName']}</FormError>}
+            </FormInputColumn>
+            <FormInputColumn>
+              <FormLabel hasError={shouldShowError('lastName')}>Last name</FormLabel>
+              <SingleLineTextInput {...textFieldPropsGenerator('lastName')} />
+              {shouldShowError('lastName') && <FormError>{state.validation['lastName']}</FormError>}
+            </FormInputColumn>
+          </FormFieldSplitLayout>
+        </FormFieldContainer>
+        <FormFieldContainer>
+          <FormQuestionColumn>
+            <FormQuestionStep>step 2.</FormQuestionStep>
+            <FormQuestionText>What’s your email?</FormQuestionText>
+          </FormQuestionColumn>
+          <FormFieldVerticalLayout>
+            <FormInputColumn>
+              <FormLabel hasError={shouldShowError('email')}>Email</FormLabel>
+              <SingleLineTextInput {...textFieldPropsGenerator('email')} />
+              {shouldShowError('email') && <FormError>{state.validation['email']}</FormError>}
+            </FormInputColumn>
+          </FormFieldVerticalLayout>
+        </FormFieldContainer>
+        <FormFieldContainer>
+          <FormQuestionColumn>
+            <FormQuestionStep>step 3.</FormQuestionStep>
+            <FormQuestionText>What do you want the URL  of your page to be?</FormQuestionText>
+          </FormQuestionColumn>
+          <FormFieldVerticalLayout>
+            <FormInputColumn>
+              <FormLabelRow>
+                <FormLabel hasError={shouldShowError('slug')}>Page URL</FormLabel>
+                <FormWordCount hasError={shouldShowError('slug')}>({(state.values['slug'] || '').length}/30)</FormWordCount>
+              </FormLabelRow>
+              <SingleLineTextInput {...textFieldPropsGenerator('slug')} />
+              {shouldShowError('slug') && <FormError>{state.validation['slug']}</FormError>}
+              {!shouldShowError('slug') && state.values['slug'] && (
+                <FormInfo>Your page will be located at <strong>https://register.whenweallvote.org/{encodeURIComponent(state.values['slug'])}</strong></FormInfo>
+              )}
+            </FormInputColumn>
+          </FormFieldVerticalLayout>
+        </FormFieldContainer>
+        <FormFieldContainer>
+          <FormQuestionColumn>
+            <FormQuestionStep>step 4.</FormQuestionStep>
+            <FormQuestionText>Set the title of your page, get creative!</FormQuestionText>
+          </FormQuestionColumn>
+          <FormFieldVerticalLayout>
+            <FormInputColumn>
+              <FormLabelRow>
+                <FormLabel hasError={shouldShowError('title')}>Title</FormLabel>
+                <FormWordCount hasError={shouldShowError('title')}>({(state.values['title'] || '').length}/140)</FormWordCount>
+              </FormLabelRow>
+              <SingleLineTextInput {...textFieldPropsGenerator('title')} />
+              {shouldShowError('title') && <FormError>{state.validation['title']}</FormError>}
+            </FormInputColumn>
+          </FormFieldVerticalLayout>
+        </FormFieldContainer>
+        <FormFieldContainer>
+          <FormQuestionColumn>
+            <FormQuestionStep>step 5.</FormQuestionStep>
+            <FormQuestionText>Share why voting is important to you.</FormQuestionText>
+          </FormQuestionColumn>
+          <FormFieldVerticalLayout>
+            <FormInputColumn>
+              <FormLabelRow>
+                <FormLabel hasError={shouldShowError('promptAnswer')}>why is voting important to you?</FormLabel>
+                <FormWordCount hasError={shouldShowError('promptAnswer')}>({(state.values['promptAnswer'] || '').length}/2000)</FormWordCount>
+              </FormLabelRow>
+              <MultiLineTextInput rows="4" {...textFieldPropsGenerator('promptAnswer')} />
+              {shouldShowError('promptAnswer') && <FormError>{state.validation['promptAnswer']}</FormError>}
+            </FormInputColumn>
+          </FormFieldVerticalLayout>
+        </FormFieldContainer>
+        <FormFieldContainer>
+          <FormQuestionColumn>
+            <FormQuestionStep>step 6.</FormQuestionStep>
+            <FormQuestionText>Pick your favorite Gif to grab their attention!</FormQuestionText>
+          </FormQuestionColumn>
+          <FormFieldVerticalLayout>
+            {!state.values.gifUrl && (
+              <React.Fragment>
+                <FormInputColumn>
+                  <FormLabel hasError={shouldShowError('gifQuery')}>Search Giphy</FormLabel>
+                  <SingleLineTextInput {...textFieldPropsGenerator('gifQuery')} />
+                  {shouldShowError('gifQuery') && <FormError>{state.validation['gifQuery']}</FormError>}
+                </FormInputColumn>
+                {!state.hideGifGallery && (
                   <Carousel
                     gifHeight={200}
                     fetchGifs={(offset) => giphyFetch.search(state.values.gifQuery, { offset, limit: 10, rating: 'g' })}
                     hideAttribution={true}
                     onGifClick={onGifClick}
                   />
-                </React.Fragment>
-              )}
-              {state.values.gifUrl && (
-                <React.Fragment>
-                  <img src={state.values.gifUrl} alt={state.values.gifTitle} />
-                  <GifResetButton onClick={resetGif}>Pick a different gif</GifResetButton>
-                </React.Fragment>
-              )}
-            </FormFieldVerticalLayout>
-          </FormFieldContainer>
-          <SubmissionRow>
-            <SubmitPrompt>Ready to share?</SubmitPrompt>
-            <SubmitButton type="submit">publish</SubmitButton>
-            {state.formError && (
-              <SubmissionError>{state.formError}</SubmissionError>
+                )}
+              </React.Fragment>
             )}
-          </SubmissionRow>
-        </form>
-      </Page>
-    </React.Fragment>
+            {state.values.gifUrl && (
+              <React.Fragment>
+                <img src={state.values.gifUrl} alt={state.values.gifTitle} />
+                <GifResetButton onClick={resetGif}>Pick a different gif</GifResetButton>
+              </React.Fragment>
+            )}
+          </FormFieldVerticalLayout>
+        </FormFieldContainer>
+        <SubmissionRow>
+          <SubmitPrompt>Ready to share?</SubmitPrompt>
+          <SubmitButton type="submit">publish</SubmitButton>
+          {state.formError && (
+            <SubmissionError>{state.formError}</SubmissionError>
+          )}
+        </SubmissionRow>
+      </form>
+    </Page>
   );
 }
