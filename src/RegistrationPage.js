@@ -141,11 +141,7 @@ const PromptResponse = styled.p`
   font-size: 18px;
   line-height: 1.3;
   color: ${({ theme }) => theme.colors.navy};
-  margin-bottom: 36px;
-
-  @media (min-width: 1024px) {
-    margin-bottom: 48px;
-  }
+  margin-bottom: 24px;
 `;
 
 const HighlightBox = styled.div`
@@ -197,7 +193,7 @@ const RegisterButton = styled.button`
   text-transform: uppercase;
   letter-spacing: 1px;
 
-  background: ${({ theme }) => theme.colors.navy};
+  background: ${({ theme }) => theme.colors.purple};
   border-radius: 4px;
 
   cursor: pointer;
@@ -206,7 +202,26 @@ const RegisterButton = styled.button`
   padding: 12px 24px;
 
   &:hover {
-    background: ${({ theme }) => theme.colors.purple};
+    background: ${({ theme }) => theme.colors.navy};
+  }
+`;
+
+const ShareRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 36px;
+
+  @media (min-width: 1024px) {
+    margin-bottom: 48px;
+  }
+
+  a {
+    margin-right: 12px;
+    cursor: pointer;
+
+    img {
+      width: 32px;
+    }
   }
 `;
 
@@ -229,6 +244,7 @@ export default function RegistrationPage(props) {
   const [isFadingIn, setisFadingIn] = React.useState(false);
   const [isFadingOut, setIsFadingOut] = React.useState(false);
   const [iframeUrl, setIframeUrl] = React.useState(null);
+  const [shareLinks, setShareLinks] = React.useState({ twitterLink: '', facebookLink: '' });
 
   const embedContainerRef = React.useRef(null);
 
@@ -244,6 +260,13 @@ export default function RegistrationPage(props) {
     const scriptUrl = "//s3.amazonaws.com/rocky-assets/assets/iframeResizer.min-ce97b888b19f31ac300ddea612953fa47c786ad20eb5194df2db64df3536c2ed.js";
     script.src = scriptUrl;
     window.document.head.appendChild(script);
+  }, []);
+
+  React.useEffect(() => {
+    const facebookLink = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=${encodeURIComponent(highlightTitle || '')}`;
+    const twitterLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${highlightTitle || ''}\n${window.location.href}`)}`;
+
+    setShareLinks({ facebookLink, twitterLink });
   }, []);
 
   React.useEffect(() => {
@@ -312,6 +335,8 @@ export default function RegistrationPage(props) {
     ? `${firstName} has registered ${totalSignups} new voter${totalSignups > 1 ? 's' : ''} voters so far!`
     : `${firstName} is trying to register 20 new voters before election day`;
 
+
+
   return (
     <Page isRegistering={isRegistering} isFadingIn={isFadingIn} isFadingOut={isFadingOut}>
       <Helmet>
@@ -337,6 +362,14 @@ export default function RegistrationPage(props) {
             <Byline>Created by <strong>{firstName} {lastName}</strong></Byline>
             <PromptTitle>Why voting is important to me</PromptTitle>
             <PromptResponse>{promptAnswer}</PromptResponse>
+            <ShareRow>
+              <a href={shareLinks.facebookLink}>
+                <img src="/facebook.png" alt="Facebook logo" />
+              </a>
+              <a href={shareLinks.twitterLink}>
+                <img src="/twitter.png" alt="Twitter logo" />
+              </a>
+            </ShareRow>
             <HighlightBox>
               <HighlightTitle>{highlightTitle}</HighlightTitle>
               <HighlightCopy>Make sure you and all of your friends  are registered to vote by using our online voter registration form and sharing this page.</HighlightCopy>
