@@ -12,9 +12,9 @@ const htmlLayout = `
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <meta property="og:image" content="https://www.whenweallvote.org/wp-content/uploads/2019/06/wwav_meta_mo_nophone.png">
+    <meta property="og:image" content="/meta.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://www.whenweallvote.org/wp-content/uploads/2019/06/wwav_meta_mo_nophone.png">
+    <meta name="twitter:image" content="/meta.png">
 
     {{HEAD}}
 
