@@ -310,7 +310,7 @@ export default function RegistrationPage(props) {
 
   const highlightTitle = totalSignups
     ? `${firstName} has registered ${totalSignups} new voter${totalSignups > 1 ? 's' : ''} voters so far!`
-    : `${firstName} is trying to reigster 20 new voters before election day`;
+    : `${firstName} is trying to register 20 new voters before election day`;
 
   return (
     <Page isRegistering={isRegistering} isFadingIn={isFadingIn} isFadingOut={isFadingOut}>
