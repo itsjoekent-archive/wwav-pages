@@ -297,6 +297,13 @@ const SubmissionError = styled.p`
   margin-top: 24px;
 `;
 
+const AttributionMark = styled.img`
+  width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 24px;
+`;
+
 const labelMap = {
   firstName: 'First name',
   lastName: 'Last name',
@@ -755,6 +762,7 @@ export default function BuildPage() {
                 <GifResetButton onClick={resetGif}>Pick a different gif</GifResetButton>
               </React.Fragment>
             )}
+            <AttributionMark src="/giphy-attribution.png" alt="Powered by GIPHY" />
           </FormFieldVerticalLayout>
         </FormFieldContainer>
         <SubmissionRow>
