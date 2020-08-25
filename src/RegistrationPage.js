@@ -163,7 +163,7 @@ const HighlightTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.openSans};
   font-weight: 900;
   font-size: 24px;
-  line-height: 1.2;
+  line-height: 1.4;
   text-align: center;
   color: ${({ theme }) => theme.colors.navy};
   margin-bottom: 16px;
