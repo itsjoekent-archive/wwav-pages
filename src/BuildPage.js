@@ -749,7 +749,7 @@ export default function BuildPage() {
                 {!state.hideGifGallery && (
                   <Carousel
                     gifHeight={200}
-                    fetchGifs={(offset) => giphyFetch.search(state.values.gifQuery, { offset, limit: 10, rating: 'g' })}
+                    fetchGifs={(offset) => giphyFetch.search('', { offset, limit: 10, channel: 'WhenWeAllVote' })}
                     hideAttribution={true}
                     onGifClick={onGifClick}
                   />
