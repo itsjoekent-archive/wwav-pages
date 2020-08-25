@@ -317,7 +317,7 @@ export default function BuildPage() {
   const [state, dispatch] = React.useReducer(
     (state, action) => action(state),
     {
-      values: { gifQuery: 'voting' },
+      values: {},
       isFocused: {},
       hasFocusedOnce: {},
       validation: {},
@@ -329,7 +329,7 @@ export default function BuildPage() {
     },
   );
 
-  const previousValuesRef = React.useRef({ gifQuery: 'vote' });
+  const previousValuesRef = React.useRef({});
   const previousValues = previousValuesRef.current;
 
   React.useEffect(() => {
@@ -535,28 +535,6 @@ export default function BuildPage() {
   ]);
 
   React.useEffect(() => {
-    if (state.values.gifUrl) {
-      return;
-    }
-
-    if (state.values.gifQuery !== previousValues.gifQuery) {
-      if (!state.hideGifGallery) {
-        dispatch((copy) => ({ ...copy, hideGifGallery: true }));
-      }
-    }
-
-    if (state.hideGifGallery) {
-      dispatch((copy) => ({ ...copy, hideGifGallery: false }));
-    }
-  }, [
-    dispatch,
-    state.values.gifUrl,
-    state.values.gifQuery,
-    state.hideGifGallery,
-    previousValues.gifQuery,
-  ]);
-
-  React.useEffect(() => {
     if (!state.hasSubmitted) {
       return;
     }
@@ -739,22 +717,13 @@ export default function BuildPage() {
             <FormQuestionText>Pick your favorite Gif to grab their attention!</FormQuestionText>
           </FormQuestionColumn>
           <FormFieldVerticalLayout>
-            {!state.values.gifUrl && (
-              <React.Fragment>
-                <FormInputColumn>
-                  <FormLabel hasError={shouldShowError('gifQuery')}>Search Giphy</FormLabel>
-                  <SingleLineTextInput {...textFieldPropsGenerator('gifQuery')} />
-                  {shouldShowError('gifQuery') && <FormError>{state.validation['gifQuery']}</FormError>}
-                </FormInputColumn>
-                {!state.hideGifGallery && (
-                  <Carousel
-                    gifHeight={200}
-                    fetchGifs={(offset) => giphyFetch.search('', { offset, limit: 10, channel: 'WhenWeAllVote' })}
-                    hideAttribution={true}
-                    onGifClick={onGifClick}
-                  />
-                )}
-              </React.Fragment>
+            {!state.hideGifGallery && (
+              <Carousel
+                gifHeight={200}
+                fetchGifs={(offset) => giphyFetch.search('', { offset, limit: 10, channel: 'WhenWeAllVote' })}
+                hideAttribution={true}
+                onGifClick={onGifClick}
+              />
             )}
             {state.values.gifUrl && (
               <React.Fragment>
