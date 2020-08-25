@@ -333,9 +333,7 @@ export default function RegistrationPage(props) {
 
   const highlightTitle = totalSignups
     ? `${firstName} has registered ${totalSignups} new voter${totalSignups > 1 ? 's' : ''} voters so far!`
-    : `${firstName} is trying to register 20 new voters before election day`;
-
-
+    : `${firstName} is trying to register 20 new voters before the voter registration deadline`;
 
   return (
     <Page isRegistering={isRegistering} isFadingIn={isFadingIn} isFadingOut={isFadingOut}>
@@ -372,7 +370,7 @@ export default function RegistrationPage(props) {
             </ShareRow>
             <HighlightBox>
               <HighlightTitle>{highlightTitle}</HighlightTitle>
-              <HighlightCopy>Make sure you and all of your friends  are registered to vote by using our online voter registration form and sharing this page.</HighlightCopy>
+              <HighlightCopy>Make sure you are registered to vote by completing this online registration form. Then share with all your friends to make sure they are registered too!</HighlightCopy>
               <RegisterButton onClick={() => setIsFadingOut(true)}>register to vote</RegisterButton>
             </HighlightBox>
           </ContentColumn>
