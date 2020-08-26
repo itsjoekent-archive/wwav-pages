@@ -3,7 +3,6 @@ import styled, { ThemeProvider } from 'styled-components';
 import BuildPage from './BuildPage';
 import RegistrationPage from './RegistrationPage';
 import NotFoundPage from './NotFoundPage';
-import Banner from './Banner';
 import Footer from './Footer';
 import theme from './theme';
 import { BUILD_PAGE_TYPE, REGISTER_PAGE_TYPE } from './pageTypes';
@@ -38,7 +37,6 @@ export default function Application(props) {
   return (
     <ThemeProvider theme={theme}>
       <Page>
-        <Banner />
         <ApplicationComponentWrapper>
           <ApplicationComponent />
         </ApplicationComponentWrapper>

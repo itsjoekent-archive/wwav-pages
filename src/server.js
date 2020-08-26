@@ -21,6 +21,7 @@ const {
   SPREADSHEET_ID,
   GOOGLE_SERVICE_ACCOUNT_EMAIL,
   GOOGLE_PRIVATE_KEY,
+  PROGRAM,
 } = process.env;
 
 const app = express();
@@ -295,9 +296,9 @@ app.get('*', async function (req, res) {
           <meta name="og:description" content="Join When We All Vote to make sure every eligible voter is registered and ready to vote in every election." />
           <meta name="twitter:description" content="Join When We All Vote to make sure every eligible voter is registered and ready to vote in every election." />
 
-          <meta property="og:image" content="https://www.whenweallvote.org/wp-content/uploads/2019/06/wwav_meta_mo_nophone.png">
+          <meta property="og:image" content="/meta-${PROGRAM}.png">
           <meta name="twitter:card" content="summary_large_image">
-          <meta name="twitter:image" content="https://www.whenweallvote.org/wp-content/uploads/2019/06/wwav_meta_mo_nophone.png">
+          <meta property="twitter:image" content="/meta-${PROGRAM}.png">
 
           <link rel="icon" type="image/x-icon" href="https://www.whenweallvote.org/wp-content/themes/whenwevote/favicon.png">
 

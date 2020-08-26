@@ -263,8 +263,10 @@ export default function RegistrationPage(props) {
   }, []);
 
   React.useEffect(() => {
-    const facebookLink = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=${encodeURIComponent(highlightTitle || '')}`;
-    const twitterLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${highlightTitle || ''}\n${window.location.href}`)}`;
+    const hashtag = process.env.PROGRAM === 'msv' ? '#MySchoolVotes' : '#WhenWeAllVote'
+
+    const facebookLink = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=${encodeURIComponent(highlightTitle || '')} ${hashtag}`;
+    const twitterLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`${highlightTitle || ''} ${hashtag}\n${window.location.href}`)}`;
 
     setShareLinks({ facebookLink, twitterLink });
   }, []);
@@ -323,7 +325,8 @@ export default function RegistrationPage(props) {
         return url;
       };
 
-      setIframeUrl(makeIframeUrl({ partner: 37284, tracking: `msv-custom-${slug}` }));
+      console.log(`${process.env.PROGRAM}-custom-${slug}`);
+      setIframeUrl(makeIframeUrl({ partner: 37284, tracking: `${process.env.PROGRAM}-custom-${slug}` }));
     }
   }, [
     iframeUrl,

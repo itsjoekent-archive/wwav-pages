@@ -253,14 +253,13 @@ const SubmissionRow = styled.div`
   margin-right: auto;
 `;
 
-const SubmitPrompt = styled.h3`
+const SubmitPrompt = styled.p`
   font-family: ${({ theme }) => theme.fonts.openSans};
-  font-weight: 700;
-  font-size: 32px;
-  line-height: 1.1;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.3;
   color: ${({ theme }) => theme.colors.navy};
   text-align: center;
-  text-transform: uppercase;
   margin-bottom: 24px;
 `;
 
@@ -735,7 +734,7 @@ export default function BuildPage() {
           </FormFieldVerticalLayout>
         </FormFieldContainer>
         <SubmissionRow>
-          <SubmitPrompt>Ready to share?</SubmitPrompt>
+          <SubmitPrompt>Ready to share? Once you create your page you won't be able to edit it, so make sure to take a look at your details before you submit!</SubmitPrompt>
           <SubmitButton type="submit">publish</SubmitButton>
           {state.formError && (
             <SubmissionError>{state.formError}</SubmissionError>
