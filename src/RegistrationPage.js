@@ -325,7 +325,6 @@ export default function RegistrationPage(props) {
         return url;
       };
 
-      console.log(`${process.env.PROGRAM}-custom-${slug}`);
       setIframeUrl(makeIframeUrl({ partner: 37284, tracking: `${process.env.PROGRAM}-custom-${slug}` }));
     }
   }, [
