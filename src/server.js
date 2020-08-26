@@ -8,10 +8,20 @@ const xss = require('xss');
 const asyncRedis = require('async-redis');
 const RateLimitRedisStore = require('rate-limit-redis');
 const Filter = require('bad-words');
+const { GoogleSpreadsheet } = require('google-spreadsheet');
 
 const { default: ssr } = require('./ssr-compiled');
 
-const { IS_PROD, PORT, REDIS_URL, API_TOKEN, ADMIN_PASS } = process.env;
+const {
+  IS_PROD,
+  PORT,
+  REDIS_URL,
+  API_TOKEN,
+  ADMIN_PASS,
+  SPREADSHEET_ID,
+  GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  GOOGLE_PRIVATE_KEY,
+} = process.env;
 
 const app = express();
 const filter = new Filter();
@@ -27,6 +37,8 @@ app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+
+const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
 
 const client = asyncRedis.createClient({ url: REDIS_URL });
 
@@ -183,6 +195,9 @@ app.post('/api/page', async function (req, res) {
 
     await client.set(key, JSON.stringify(page));
 
+    const sheet = doc.sheetsByIndex[0];
+    await sheet.addRow({ slug, firstName, lastName, email, title, promptAnswer, createdAt: new Date() });
+
     res.json({ page });
   } catch (error) {
     console.error(error);
@@ -335,4 +350,18 @@ app.get('*', async function (req, res) {
   }
 });
 
-app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+(async function() {
+  try {
+    await doc.useServiceAccountAuth({
+      client_email: GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      private_key: GOOGLE_PRIVATE_KEY.replace(/\\n/gm, '\n'),
+    });
+
+    await doc.loadInfo();
+
+    app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+})();
