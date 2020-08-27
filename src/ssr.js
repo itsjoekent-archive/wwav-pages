@@ -105,6 +105,8 @@ export default async function ssr(path, client) {
       const data = JSON.parse(page);
       delete data.email;
 
+      data.totalSignups = await client.get(`signups::${slug}`);
+
       embeddedData.pageFields = data;
       embeddedData.pageType = REGISTER_PAGE_TYPE;
     }
