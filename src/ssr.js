@@ -5,7 +5,7 @@ import { ServerStyleSheet } from 'styled-components';
 import Application from './Application';
 import { BUILD_PAGE_TYPE, REGISTER_PAGE_TYPE } from './pageTypes';
 
-const { PROGRAM } = process.env;
+const { PROGRAM, PUBLIC_URL } = process.env;
 
 const htmlLayout = `
 <!DOCTYPE html>
@@ -14,9 +14,9 @@ const htmlLayout = `
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <meta property="og:image" content="/${PROGRAM}-meta.png">
+    <meta property="og:image" content="${PUBLIC_URL}/${PROGRAM}-meta.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:image" content="/${PROGRAM}-meta.png">
+    <meta property="twitter:image" content="${PUBLIC_URL}/${PROGRAM}-meta.png">
 
     {{HEAD}}
 
