@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { Carousel } from '@giphy/react-components';
 import { GiphyFetch } from '@giphy/js-fetch-api';
 import DefaultMeta from './DefaultMeta';
@@ -186,6 +186,57 @@ const FormFieldVerticalLayout = styled.div`
   }
 `;
 
+const GifFormFieldVerticalLayout = styled(FormFieldVerticalLayout)`
+  position: relative;
+
+  .giphy-carousel {
+    border: 4px solid ${({ theme }) => theme.colors.purple};
+  }
+`;
+
+const slideKeyframes = keyframes`
+  0% {
+    left: 80%;
+  }
+
+  100% {
+    left: 85%;
+  }
+`;
+
+const GifScrollIndicator = styled.span`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+
+  position: absolute;
+  top: calc(50% - 48px);
+  left: 80%;
+  z-index: 1000;
+
+  background-color: ${({ theme }) => theme.colors.purple};
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0px 0px 7px 1px rgba(0, 0, 0, 0.7);
+
+  animation: 1s ${slideKeyframes} infinite alternate linear;
+
+  &:before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 12px solid ${({ theme }) => theme.colors.white};
+  }
+`;
+
 const FormFieldSplitLayout = styled.div`
   display: flex;
   flex-direction: column;
@@ -325,6 +376,7 @@ export default function BuildPage() {
       hasSubmitted: false,
       formError: null,
       isSlugTaken: false,
+      hideScrollHint: false,
     },
   );
 
@@ -382,6 +434,7 @@ export default function BuildPage() {
     }
 
     return {
+      id: fieldId,
       value: state.values[fieldId] || '',
       hasError: shouldShowError(fieldId),
       onChange,
@@ -578,6 +631,30 @@ export default function BuildPage() {
     state.values,
   ]);
 
+  React.useEffect(() => {
+    if (state.hideScrollHint) {
+      return;
+    }
+
+    const element = document.getElementsByClassName('giphy-carousel')[0];
+
+    if (element) {
+      function onScroll() {
+        dispatch((copy) => ({
+          ...copy,
+          hideScrollHint: true,
+        }));
+      }
+
+      element.addEventListener('scroll', onScroll);
+
+      return () => element.removeEventListener('scroll', onScroll);
+    }
+  }, [
+    dispatch,
+    state.hideScrollHint,
+  ]);
+
   function onGifClick(gif, event) {
     event.preventDefault();
     dispatch((copy) => ({
@@ -635,12 +712,12 @@ export default function BuildPage() {
           </FormQuestionColumn>
           <FormFieldSplitLayout>
             <FormInputColumn>
-              <FormLabel hasError={shouldShowError('firstName')}>First name</FormLabel>
+              <FormLabel htmlFor="firstName" hasError={shouldShowError('firstName')}>First name</FormLabel>
               <SingleLineTextInput {...textFieldPropsGenerator('firstName')} />
               {shouldShowError('firstName') && <FormError>{state.validation['firstName']}</FormError>}
             </FormInputColumn>
             <FormInputColumn>
-              <FormLabel hasError={shouldShowError('lastName')}>Last name</FormLabel>
+              <FormLabel htmlFor="lastName" hasError={shouldShowError('lastName')}>Last name</FormLabel>
               <SingleLineTextInput {...textFieldPropsGenerator('lastName')} />
               {shouldShowError('lastName') && <FormError>{state.validation['lastName']}</FormError>}
             </FormInputColumn>
@@ -653,7 +730,7 @@ export default function BuildPage() {
           </FormQuestionColumn>
           <FormFieldVerticalLayout>
             <FormInputColumn>
-              <FormLabel hasError={shouldShowError('email')}>Email</FormLabel>
+              <FormLabel htmlFor="email" hasError={shouldShowError('email')}>Email</FormLabel>
               <SingleLineTextInput {...textFieldPropsGenerator('email')} />
               {shouldShowError('email') && <FormError>{state.validation['email']}</FormError>}
             </FormInputColumn>
@@ -667,13 +744,13 @@ export default function BuildPage() {
           <FormFieldVerticalLayout>
             <FormInputColumn>
               <FormLabelRow>
-                <FormLabel hasError={shouldShowError('slug')}>Page URL</FormLabel>
+                <FormLabel htmlFor="slug" hasError={shouldShowError('slug')}>Page URL</FormLabel>
                 <FormWordCount hasError={shouldShowError('slug')}>({(state.values['slug'] || '').length}/30)</FormWordCount>
               </FormLabelRow>
               <SingleLineTextInput {...textFieldPropsGenerator('slug')} />
               {shouldShowError('slug') && <FormError>{state.validation['slug']}</FormError>}
               {!shouldShowError('slug') && state.values['slug'] && (
-                <FormInfo>Your page will be located at <strong>https://register.whenweallvote.org/{encodeURIComponent(state.values['slug'])}</strong></FormInfo>
+                <FormInfo>Your page will be located at <strong>{process.env.PUBLIC_URL}/{encodeURIComponent(state.values['slug'])}</strong></FormInfo>
               )}
             </FormInputColumn>
           </FormFieldVerticalLayout>
@@ -702,7 +779,7 @@ export default function BuildPage() {
           <FormFieldVerticalLayout>
             <FormInputColumn>
               <FormLabelRow>
-                <FormLabel hasError={shouldShowError('promptAnswer')}>why is voting important to you?</FormLabel>
+                <FormLabel htmlFor="promptAnswer" hasError={shouldShowError('promptAnswer')}>why is voting important to you?</FormLabel>
                 <FormWordCount hasError={shouldShowError('promptAnswer')}>({(state.values['promptAnswer'] || '').length}/2000)</FormWordCount>
               </FormLabelRow>
               <MultiLineTextInput rows="4" {...textFieldPropsGenerator('promptAnswer')} />
@@ -715,14 +792,17 @@ export default function BuildPage() {
             <FormQuestionStep>step 6.</FormQuestionStep>
             <FormQuestionText>Pick your favorite Gif to grab their attention!</FormQuestionText>
           </FormQuestionColumn>
-          <FormFieldVerticalLayout>
+          <GifFormFieldVerticalLayout>
             {!state.hideGifGallery && (
-              <Carousel
-                gifHeight={200}
-                fetchGifs={(offset) => giphyFetch.search('', { offset, limit: 10, channel: 'WhenWeAllVote' })}
-                hideAttribution={true}
-                onGifClick={onGifClick}
-              />
+              <React.Fragment>
+                {!state.hideScrollHint && <GifScrollIndicator />}
+                <Carousel
+                  gifHeight={200}
+                  fetchGifs={(offset) => giphyFetch.search('', { offset, limit: 10, channel: 'WhenWeAllVote' })}
+                  hideAttribution={true}
+                  onGifClick={onGifClick}
+                />
+              </React.Fragment>
             )}
             {state.values.gifUrl && (
               <React.Fragment>
@@ -731,7 +811,7 @@ export default function BuildPage() {
               </React.Fragment>
             )}
             <AttributionMark src="/giphy-attribution.png" alt="Powered by GIPHY" />
-          </FormFieldVerticalLayout>
+          </GifFormFieldVerticalLayout>
         </FormFieldContainer>
         <SubmissionRow>
           <SubmitPrompt>Ready to share? Once you create your page you won't be able to edit it, so make sure to take a look at your details before you submit!</SubmitPrompt>

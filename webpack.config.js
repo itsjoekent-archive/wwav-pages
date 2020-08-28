@@ -19,6 +19,7 @@ const sharedConfig = {
     new webpack.DefinePlugin({
       'process.env.GIPHY_SDK_KEY': JSON.stringify(process.env.GIPHY_SDK_KEY),
       'process.env.PROGRAM': JSON.stringify(process.env.PROGRAM),
+      'process.env.PUBLIC_URL': JSON.stringify(process.env.PUBLIC_URL),
     }),
   ],
 };

@@ -334,7 +334,7 @@ export default function RegistrationPage(props) {
   ]);
 
   const highlightTitle = totalSignups
-    ? `${firstName} has registered ${totalSignups} new voter${totalSignups > 1 ? 's' : ''} voters so far!`
+    ? `${firstName} has registered ${totalSignups} voter${totalSignups > 1 ? 's' : ''} so far!`
     : `${firstName} is trying to register 20 new voters before the voter registration deadline`;
 
   return (
