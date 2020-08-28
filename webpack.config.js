@@ -2,8 +2,10 @@ require('dotenv').config();
 
 const path = require('path');
 const webpack = require('webpack');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 const sharedConfig = {
+  mode: process.env.IS_PROD ? 'production' : 'development',
   module: {
     rules: [
       {
@@ -23,6 +25,12 @@ const sharedConfig = {
     }),
   ],
 };
+
+if (process.env.IS_PROD) {
+  sharedConfig.plugins.push(new CompressionPlugin({
+    test: /\.js(\?.*)?$/i,
+  }));
+}
 
 module.exports = [
   {
