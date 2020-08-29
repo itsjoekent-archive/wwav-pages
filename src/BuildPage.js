@@ -194,29 +194,19 @@ const GifFormFieldVerticalLayout = styled(FormFieldVerticalLayout)`
   }
 `;
 
-const slideKeyframes = keyframes`
-  0% {
-    left: 80%;
-  }
-
-  100% {
-    left: 85%;
-  }
-`;
 
 const GifScrollIndicator = styled.span`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
-
-  width: 48px;
   height: 48px;
-  border-radius: 50%;
+  padding-left: 8px;
+  padding-right: 22px;
 
   position: absolute;
   top: calc(50% - 48px);
-  left: 80%;
+  right: -16px;
   z-index: 1000;
 
   background-color: ${({ theme }) => theme.colors.purple};
@@ -224,16 +214,24 @@ const GifScrollIndicator = styled.span`
   border-radius: 8px;
   box-shadow: 0px 0px 7px 1px rgba(0, 0, 0, 0.7);
 
-  animation: 1s ${slideKeyframes} infinite alternate linear;
+  font-family: ${({ theme }) => theme.fonts.openSans};
+  font-weight: 800;
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.white};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 
-  &:before {
+  &:after {
     content: '';
     display: block;
+    position: absolute;
+    right: 8px;
     width: 0;
     height: 0;
-    border-top: 12px solid transparent;
-    border-bottom: 12px solid transparent;
-    border-left: 12px solid ${({ theme }) => theme.colors.white};
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid ${({ theme }) => theme.colors.white};
   }
 `;
 
@@ -795,7 +793,7 @@ export default function BuildPage() {
           <GifFormFieldVerticalLayout>
             {!state.hideGifGallery && (
               <React.Fragment>
-                {!state.hideScrollHint && <GifScrollIndicator />}
+                {!state.hideScrollHint && <GifScrollIndicator>Scroll for more gifs</GifScrollIndicator>}
                 <Carousel
                   gifHeight={200}
                   fetchGifs={(offset) => giphyFetch.search('', { offset, limit: 10, channel: 'WhenWeAllVote' })}
