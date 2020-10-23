@@ -245,8 +245,8 @@ export default function RegistrationPage(props) {
           <HighlightBox>
             <HighlightTitle>{highlightTitle}</HighlightTitle>
             <HighlightCopy>Make sure you are registered to vote by completing this online registration form. Then share with all your friends to make sure they are registered too!</HighlightCopy>
-            <RegisterButton href={`https://register.whenweallvote.org/?utm_campaign=msv_custom&utm_medium=web&utm_source=${slug}`}>
-              register to vote
+            <RegisterButton href={`https://www.whenweallvote.org/vrh/?utm_campaign=msv&utm_medium=relationaltool&utm_source=MSVrelationaltool&utm_content=msvrelationaltool&utm_term=msvrelationaltool`}>
+              make a plan to vote
             </RegisterButton>
           </HighlightBox>
         </ContentColumn>
