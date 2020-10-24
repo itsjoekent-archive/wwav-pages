@@ -159,9 +159,22 @@ const RegisterButton = styled.a`
   border: none;
 
   padding: 12px 24px;
+  margin-bottom: 16px;
 
   &:hover {
     background: ${({ theme }) => theme.colors.navy};
+  }
+`;
+
+const PlanLink = styled.a`
+  font-family: ${({ theme }) => theme.fonts.openSans};
+  font-weight: 300;
+  font-size: 18px;
+  color: ${({ theme }) => theme.colors.navy};
+  text-decoration: underline;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.purple};
   }
 `;
 
@@ -245,9 +258,12 @@ export default function RegistrationPage(props) {
           <HighlightBox>
             <HighlightTitle>{highlightTitle}</HighlightTitle>
             <HighlightCopy>Make sure you are registered to vote by completing this online registration form. Then share with all your friends to make sure they are registered too!</HighlightCopy>
-            <RegisterButton href={`https://www.whenweallvote.org/vrh/?utm_campaign=msv&utm_medium=relationaltool&utm_source=MSVrelationaltool&utm_content=msvrelationaltool&utm_term=msvrelationaltool`}>
-              make a plan to vote
+            <RegisterButton href={`https://register.whenweallvote.org/?utm_campaign=msv_custom&utm_medium=web&utm_source=${slug}`}>
+              register to vote
             </RegisterButton>
+            <PlanLink href="https://www.whenweallvote.org/vrh/?utm_campaign=msv&utm_medium=relationaltool&utm_source=MSVrelationaltool&utm_content=msvrelationaltool&utm_term=msvrelationaltool">
+              Already registered? Make a plan to vote!
+            </PlanLink>
           </HighlightBox>
         </ContentColumn>
       </React.Fragment>
